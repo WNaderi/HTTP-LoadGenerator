@@ -1,0 +1,1 @@
+g++ LoadGeneratorClient.cpp ThreadPool.cpp -o http-loadgen $(curl-config --cflags --libs)
