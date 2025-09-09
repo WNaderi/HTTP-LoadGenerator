@@ -1,2 +1,0 @@
-/home/arian/projects/http-loadgen/build/CMakeFiles/edit_cache.dir
-/home/arian/projects/http-loadgen/build/CMakeFiles/rebuild_cache.dir
