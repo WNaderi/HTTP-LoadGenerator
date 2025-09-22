@@ -111,7 +111,7 @@ void LoadGeneratorClient::Run_Thread_Pool() {
     };
     tpool = new ThreadPool(task, user_num_req, pool_size);
     tpool->Terminate_Thread_Pool();
-    delete(tpool);
+    delete tpool;
 
 }
 

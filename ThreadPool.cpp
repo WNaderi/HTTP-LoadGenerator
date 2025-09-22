@@ -59,3 +59,16 @@ void ThreadPool::Terminate_Thread_Pool() {
 
 }
 
+ThreadPool::~ThreadPool() {
+    {
+        std::unique_lock<std::mutex> lock(task_queue_mutex);
+        shutdown = true;
+    }
+    cv.notify_all();
+    for (auto& t : threads) {
+        if (t.joinable())
+            t.join();
+    }
+}
+
+

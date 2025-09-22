@@ -26,6 +26,7 @@ class ThreadPool {
     public:
 
         ThreadPool(std::function<void()> func, int num_requests, int req_pool_size);
+        ~ThreadPool();
 
         void Terminate_Thread_Pool();
 
