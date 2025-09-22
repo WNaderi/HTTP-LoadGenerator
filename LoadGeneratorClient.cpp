@@ -177,7 +177,7 @@ void LoadGeneratorClient::Save_results(int num_threads) {
 void Parse_Args(int argc, char* argv[]) {
 
     /*  
-        Ex usage. ./LoadGeneratorClient -n 1000 -p (for pool) <url> <# of threads>
+        Ex usage. ./LoadGeneratorClient -p (for pool) <url> <# of threads>
     */
 
     if (argc < 2) {
