@@ -31,6 +31,8 @@ char* user_url;
 int user_num_req = 1;
 LoadGeneratorClient::thread_type type = LoadGeneratorClient::per_request;
 int pool_size;
+bool user_save_to_csv = false;
+std::string user_csv_output_path = "output.csv";
 
 template <typename K>
 std::string Format_Breakdown(const std::map<K, int>& breakdown) {
@@ -131,7 +133,8 @@ void LoadGeneratorClient::Run_Thread_Per_Request() {
     total_run_time = run_end_time - run_start_time;
 
     Print_results(num_of_reqs); 
-    Save_results(num_of_reqs);   
+    if (save_to_csv)
+        Save_results(num_of_reqs);
 
 }
 
@@ -150,7 +153,8 @@ void LoadGeneratorClient::Run_Thread_Pool() {
     total_run_time = run_end_time - run_start_time;
 
     Print_results(num_of_reqs); 
-    Save_results(num_of_reqs);
+    if (save_to_csv)
+        Save_results(num_of_reqs);
     
     delete tpool;
 
@@ -172,8 +176,8 @@ void LoadGeneratorClient::Run() {
     
 }
 
-LoadGeneratorClient::LoadGeneratorClient(char* user_url, int req_num_threads, thread_type type)
-    : url(user_url), num_of_reqs(req_num_threads), type(type) {}
+LoadGeneratorClient::LoadGeneratorClient(char* user_url, int req_num_threads, thread_type type, bool save_to_csv, const std::string& csv_output_path)
+    : url(user_url), num_of_reqs(req_num_threads), type(type), save_to_csv(save_to_csv), csv_output_path(csv_output_path) {}
 
 
 void LoadGeneratorClient::Print_results(int num_requests) {
@@ -210,16 +214,16 @@ void LoadGeneratorClient::Print_results(int num_requests) {
 
 void LoadGeneratorClient::Save_results(int num_requests) {
     bool write_header = true;
-    std::ifstream existing_file("output.csv");
+    std::ifstream existing_file(csv_output_path);
     std::string first_line;
 
     if (std::getline(existing_file, first_line))
         write_header = first_line != Csv_Header();
 
-    std::ofstream file("output.csv", std::ios::app);
+    std::ofstream file(csv_output_path, std::ios::app);
 
     if (!file.is_open()) {
-        std::cerr << "Error opening output.csv\n";
+        std::cerr << "Error opening " << csv_output_path << "\n";
         return;
     }
 
@@ -251,11 +255,16 @@ void Parse_Args(int argc, char* argv[]) {
 
     /*  
         Usage:
-            ./http-loadgen <url> <request-count>
-            ./http-loadgen -p <pool-size> <url> <request-count>
+            ./http-loadgen [options] <url> <request-count>
+
+        Options:
+            -p <pool-size>   Use a thread pool with the given worker count.
+            -t               Use thread-per-request mode.
+            -o <csv-file>    Append results to a CSV file.
 
         The final positional argument is the number of requests to send.
         In thread-pool mode, -p controls how many worker threads process those requests.
+        CSV output is disabled unless -o is provided.
     */
 
     if (argc < 2) {
@@ -294,6 +303,21 @@ void Parse_Args(int argc, char* argv[]) {
                     }
 
                     break;
+                case 'o': // CSV output flag.
+
+                    if (i+1 < argc && argv[i+1][0] != '-') {
+
+                        i++;
+                        user_save_to_csv = true;
+                        user_csv_output_path = argv[i];
+
+                    } else {
+
+                        throw std::invalid_argument("Must specify CSV output file.");
+
+                    }
+
+                    break;
                 case 't': // Thread per request flag.
 
                     type = LoadGeneratorClient::per_request;
@@ -323,7 +347,7 @@ int main(int argc, char* argv[]) {
     
     Parse_Args(argc, argv);
 
-    LoadGeneratorClient loadgen(user_url, user_num_req, type);
+    LoadGeneratorClient loadgen(user_url, user_num_req, type, user_save_to_csv, user_csv_output_path);
 
     loadgen.Run();
 

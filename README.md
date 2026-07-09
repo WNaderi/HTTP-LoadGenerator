@@ -12,7 +12,7 @@ The repository also includes a simple threaded Python HTTP server for local test
   - fixed-size thread pool
 - Uses libcurl for HTTP request execution and timing information.
 - Reports metrics to stdout.
-- Appends metrics to `output.csv`.
+- Optionally appends metrics to a CSV file.
 - Includes a local threaded HTTP server on `localhost:8000` for smoke testing.
 
 ## Requirements
@@ -54,13 +54,23 @@ Thread pool mode:
 ./http-loadgen -p <pool-size> <url> <request-count>
 ```
 
+Save results to CSV:
+
+```bash
+./http-loadgen -o <csv-file> <url> <request-count>
+./http-loadgen -p <pool-size> -o <csv-file> <url> <request-count>
+```
+
 Arguments:
 
 - `<url>`: target HTTP URL, such as `http://localhost:8000/`
 - `<request-count>`: total number of requests to send
 - `<pool-size>`: number of worker threads used in thread-pool mode
+- `<csv-file>`: file path where metrics should be appended when `-o` is used
 
 The final positional argument is the number of requests, not the number of threads. In thread-pool mode, `-p <pool-size>` controls the number of worker threads.
+
+CSV output is disabled by default. Use `-o <csv-file>` when you want to save a run.
 
 ## Local Testing
 
@@ -87,6 +97,13 @@ Thread-pool example:
 
 ```bash
 ./http-loadgen -p 10 http://localhost:8000/ 100
+```
+
+Save a run to CSV:
+
+```bash
+./http-loadgen -o output.csv http://localhost:8000/ 100
+./http-loadgen -p 10 -o output.csv http://localhost:8000/ 100
 ```
 
 You can also request a specific file served by the Python server:
@@ -119,10 +136,10 @@ Small local runs can show very high requests-per-second because `localhost` requ
 
 ## CSV Output
 
-Each run appends a row to:
+CSV output is opt-in. To append a run to a CSV file, pass `-o <csv-file>`:
 
-```text
-output.csv
+```bash
+./http-loadgen -o output.csv http://localhost:8000/ 100
 ```
 
 Columns:

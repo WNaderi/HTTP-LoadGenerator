@@ -42,6 +42,8 @@ private:
     char* url;
     int num_of_reqs;
     thread_type type;
+    bool save_to_csv;
+    std::string csv_output_path;
 
     // Thread Pool Manager
     ThreadPool* tpool;
@@ -67,7 +69,7 @@ public:
 
     };
 
-    LoadGeneratorClient(char* user_url, int req_num_threads, thread_type type);
+    LoadGeneratorClient(char* user_url, int req_num_threads, thread_type type, bool save_to_csv, const std::string& csv_output_path);
 
     void Run();
     
