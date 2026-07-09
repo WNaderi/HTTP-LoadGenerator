@@ -111,6 +111,10 @@ void LoadGeneratorClient::Run_Thread_Pool() {
     };
     tpool = new ThreadPool(task, user_num_req, pool_size);
     tpool->Terminate_Thread_Pool();
+
+    Print_results(num_of_reqs); 
+    Save_results(num_of_reqs);
+    
     delete tpool;
 
 }
@@ -121,6 +125,7 @@ void LoadGeneratorClient::Run() {
 
         case LoadGeneratorClient::thread_pool:
             Run_Thread_Pool();
+            break;
 
         case LoadGeneratorClient::per_request:
             Run_Thread_Per_Request();
