@@ -19,13 +19,15 @@ void ThreadPool::Worker_Func() {
             // Execute task
             task = taskQueue.front();
             taskQueue.pop();
+            active_tasks++;
 
         }
 
         task();
 
         std::unique_lock<std::mutex> lock(task_queue_mutex);
-        if (taskQueue.empty())
+        active_tasks--;
+        if (taskQueue.empty() && active_tasks == 0)
             cv.notify_all();
 
     }
@@ -51,9 +53,9 @@ ThreadPool::ThreadPool(std::function<void()> task, int num_requests, int req_poo
 void ThreadPool::Terminate_Thread_Pool() {
 
     std::unique_lock<std::mutex> lock(task_queue_mutex);
-    cv.wait(lock, [this]{return taskQueue.empty();});
+    cv.wait(lock, [this]{return taskQueue.empty() && active_tasks == 0;});
     // Check if tasks are complete
-    if (taskQueue.empty())
+    if (taskQueue.empty() && active_tasks == 0)
         shutdown = true;
     cv.notify_all(); 
 
@@ -70,5 +72,4 @@ ThreadPool::~ThreadPool() {
             t.join();
     }
 }
-
 

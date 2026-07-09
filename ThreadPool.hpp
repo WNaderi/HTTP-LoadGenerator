@@ -13,6 +13,7 @@ class ThreadPool {
     private:
 
     bool shutdown = false;
+    int active_tasks = 0;
 
     std::vector<std::thread> threads;
 
