@@ -250,7 +250,12 @@ void LoadGeneratorClient::Save_results(int num_requests) {
 void Parse_Args(int argc, char* argv[]) {
 
     /*  
-        Ex usage. ./LoadGeneratorClient -p (for pool) <url> <# of threads>
+        Usage:
+            ./http-loadgen <url> <request-count>
+            ./http-loadgen -p <pool-size> <url> <request-count>
+
+        The final positional argument is the number of requests to send.
+        In thread-pool mode, -p controls how many worker threads process those requests.
     */
 
     if (argc < 2) {
